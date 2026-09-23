@@ -63,6 +63,7 @@ class Sidebar(QFrame):
             "Testing": "🧪",
             "Web": "🌐",
             "Utilities": "🛠",
+            "Script": "🛡️",
         }
         for category in categories:
             label = f"{icons.get(category, '•')}  {category}"
