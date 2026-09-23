@@ -86,9 +86,7 @@ QToolButton#StarButton {
     font-size: 18px;
     padding: 0 2px;
 }
-QToolButton#StarButton:hover {
-    color: #fab387;
-}
+QToolButton#StarButton:hover { color: #fab387; }
 QLabel#EmptyLabel {
     color: #7f849c;
     font-size: 14px;
@@ -154,13 +152,19 @@ QScrollBar::handle:vertical {
 QScrollBar::handle:vertical:hover { background: #585b70; }
 QScrollBar::add-line, QScrollBar::sub-line { height: 0; }
 QSplitter::handle { background: #313244; }
-QDialog#CommandPalette {
-    background: #181825;
-    border: 1px solid #45475a;
-    border-radius: 10px;
+
+/* Clipboard banner */
+QFrame#ClipboardBanner {
+    background: #313244;
+    border-bottom: 1px solid #45475a;
 }
+QLabel#ClipboardIcon { font-size: 18px; }
+QLabel#ClipboardText { color: #cdd6f4; font-size: 13px; }
+
+/* Palette page */
+QWidget#PalettePage { background: #1e1e2e; }
 QLineEdit#PaletteInput {
-    background: #1e1e2e;
+    background: #181825;
     color: #cdd6f4;
     border: none;
     border-bottom: 1px solid #313244;
@@ -169,7 +173,7 @@ QLineEdit#PaletteInput {
     selection-background-color: #89b4fa;
 }
 QListWidget#PaletteList {
-    background: #181825;
+    background: #1e1e2e;
     border: none;
     outline: none;
     padding: 6px;
@@ -299,11 +303,17 @@ QLabel#StatusLabel { color: #40a02b; }
 QLabel#StatusLabel[error="true"] { color: #d20f39; }
 QScrollArea { border: none; }
 QSplitter::handle { background: #ccd0da; }
-QDialog#CommandPalette {
-    background: #ffffff;
-    border: 1px solid #ccd0da;
-    border-radius: 10px;
+
+/* Clipboard banner */
+QFrame#ClipboardBanner {
+    background: #dce0e8;
+    border-bottom: 1px solid #ccd0da;
 }
+QLabel#ClipboardIcon { font-size: 18px; }
+QLabel#ClipboardText { color: #4c4f69; font-size: 13px; }
+
+/* Palette page */
+QWidget#PalettePage { background: #eff1f5; }
 QLineEdit#PaletteInput {
     background: #ffffff;
     color: #4c4f69;
@@ -313,7 +323,7 @@ QLineEdit#PaletteInput {
     font-size: 15px;
 }
 QListWidget#PaletteList {
-    background: #ffffff;
+    background: #eff1f5;
     border: none;
     outline: none;
     padding: 6px;

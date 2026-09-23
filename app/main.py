@@ -17,7 +17,7 @@ def main() -> int:
     theme.apply_theme(app, settings.theme)
 
     window = MainWindow()
-    window.show()
+    window.showFullScreen()
 
     return app.exec()
 

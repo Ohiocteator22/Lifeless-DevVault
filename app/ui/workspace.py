@@ -18,7 +18,7 @@ from app.ui.tool_card import ToolCard
 
 
 class Workspace(QWidget):
-    tool_opened = Signal(object)  # emits Tool
+    tool_opened = Signal(object)
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -35,8 +35,6 @@ class Workspace(QWidget):
         self.stack.addWidget(self._build_tool_page())
 
         self._rebuild_grid()
-
-    # ---- page construction ----
 
     def _build_grid_page(self) -> QWidget:
         page = QWidget()
@@ -85,8 +83,6 @@ class Workspace(QWidget):
         layout.addWidget(self.tool_container, 1)
 
         return page
-
-    # ---- grid logic ----
 
     def _visible_tools(self) -> list[Tool]:
         tools = registry.all()
@@ -137,8 +133,6 @@ class Workspace(QWidget):
 
         self.grid.setRowStretch(self.grid.rowCount(), 1)
 
-    # ---- public API ----
-
     def set_category(self, category: str) -> None:
         self._category = category
         self.show_grid()
@@ -152,7 +146,7 @@ class Workspace(QWidget):
         self.stack.setCurrentIndex(0)
         self._rebuild_grid()
 
-    def open_tool(self, tool: Tool) -> None:
+    def open_tool(self, tool: Tool, prefill: str | None = None) -> None:
         while self.tool_container_layout.count():
             item = self.tool_container_layout.takeAt(0)
             w = item.widget()
@@ -160,16 +154,22 @@ class Workspace(QWidget):
                 w.deleteLater()
 
         widget = tool.create_widget()
+
+        # Optional: pre-fill the tool's input if it exposes one.
+        if prefill and hasattr(widget, "input"):
+            inp = getattr(widget, "input", None)
+            if inp is not None and hasattr(inp, "setPlainText"):
+                try:
+                    inp.setPlainText(prefill)
+                except Exception:
+                    pass
+
         self.tool_container_layout.addWidget(widget)
 
         self.tool_title.setText(f"{tool.meta.icon}   {tool.meta.name}")
         self.stack.setCurrentIndex(1)
         self.tool_opened.emit(tool)
 
-    # ---- slots ----
-
     def _on_favorite_toggled(self, _tool: Tool, _is_fav: bool) -> None:
-        # Only need to redraw if we're viewing the Favorites list;
-        # the star on the card already updated itself in place.
         if self._category == "Favorites":
             QTimer.singleShot(0, self._rebuild_grid)
