@@ -6,7 +6,7 @@
 
 Stop opening 20 browser tabs for tiny developer tasks.
 
-[![Release](https://img.shields.io/github/v/release/Ohiocteator22/DevVault?style=flat-square)](https://github.com/Ohiocteator22/DevVault/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Ohiocteator22/Lifeless-DevVault?style=flat-square)](https://github.com/Ohiocteator22/DevVault/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows-blue?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
