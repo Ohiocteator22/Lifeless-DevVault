@@ -1,5 +1,5 @@
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 from app.core import theme
 from app.core.clipboard import fingerprint
 from app.core.registry import registry
+from app.core.resources import app_icon_path
 from app.core.settings import settings
 from app.ui.clipboard_banner import ClipboardBanner
 from app.ui.palette_page import PalettePage
@@ -30,6 +31,11 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("DevVault")
+
+        # Window icon (taskbar, alt-tab thumbnail)
+        _icon_path = app_icon_path()
+        if _icon_path:
+            self.setWindowIcon(QIcon(_icon_path))
 
         # Borderless window — always either fullscreen or small centered.
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
@@ -53,7 +59,9 @@ class MainWindow(QMainWindow):
         self._last_clipboard_hash: str | None = None
 
         # Shortcuts
-        QShortcut(QKeySequence("Ctrl+K"), self, activated=self._enter_palette_mode)
+        QShortcut(
+            QKeySequence("Ctrl+K"), self, activated=self._enter_palette_mode
+        )
 
     # ---------------- normal page ----------------
 
@@ -197,9 +205,13 @@ class MainWindow(QMainWindow):
 
     def changeEvent(self, event) -> None:
         super().changeEvent(event)
-        if event.type() == QEvent.ActivationChange and self.isActiveWindow():
-            if settings.clipboard_enabled and not self._palette_mode:
-                self._check_clipboard()
+        if (
+            event.type() == QEvent.ActivationChange
+            and self.isActiveWindow()
+            and settings.clipboard_enabled
+            and not self._palette_mode
+        ):
+            self._check_clipboard()
 
     def _check_clipboard(self) -> None:
         text = QApplication.clipboard().text()
@@ -207,7 +219,11 @@ class MainWindow(QMainWindow):
             return
 
         import hashlib
-        h = hashlib.sha256(text.encode("utf-8", errors="replace")).hexdigest()[:16]
+
+        h = hashlib.sha256(
+            text.encode("utf-8", errors="replace")
+        ).hexdigest()[:16]
+
         if h == self._last_clipboard_hash:
             return
         if h in settings.clipboard_dismissed:

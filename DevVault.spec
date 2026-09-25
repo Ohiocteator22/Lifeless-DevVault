@@ -1,17 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-from PyInstaller.utils.hooks import collect_submodules
-
 block_cipher = None
 
-# Qt plugins PySide6 needs at runtime
 hidden_imports = [
     "PySide6.QtCore",
     "PySide6.QtGui",
     "PySide6.QtWidgets",
 ]
 
-# Exclude big Qt modules we don't use
 excludes = [
     "PySide6.Qt3DAnimation",
     "PySide6.Qt3DCore",
@@ -53,8 +49,6 @@ excludes = [
     "PySide6.QtWebEngineQuick",
     "PySide6.QtWebEngineWidgets",
     "PySide6.QtWebSockets",
-    "PySide6.QtCharts",
-    # Standard library fat we don't need
     "tkinter",
     "unittest",
     "pydoc_data",
@@ -66,7 +60,9 @@ a = Analysis(
     ["app\\main.py"],
     pathex=["."],
     binaries=[],
-    datas=[],
+    datas=[
+        ("assets/app_icon.ico", "assets"),
+    ],
     hiddenimports=hidden_imports,
     hookspath=[],
     hooksconfig={},
@@ -90,13 +86,14 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    console=False,          # no console window
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,              # set to "assets\\icon.ico" if you have one
+    icon="assets\\app_icon.ico",
+    version="version_info.txt",
 )
 
 coll = COLLECT(
