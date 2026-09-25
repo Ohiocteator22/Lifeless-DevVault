@@ -6,7 +6,7 @@
 
 Stop opening 20 browser tabs for tiny developer tasks.
 
-[![Release](https://img.shields.io/github/v/release/Ohiocteator22/DevVault?style=flat-square)](https://github.com/Ohiocteator22/DevVault/releases/latest)
+[![Release](https://img.shields.io/github/v/release/Ohiocteator22/Lifeless-DevVault?style=flat-square)](https://github.com/Ohiocteator22/Lifeless-DevVault/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows-blue?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
@@ -67,7 +67,7 @@ When you focus DevVault with a recognized snippet on your clipboard, a banner ap
 
 ### Download the portable build
 
-1. Go to the [latest release](https://github.com/Ohiocteator22/DevVault/releases/latest)
+1. Go to the [latest release](https://github.com/Ohiocteator22/Lifeless-DevVault/releases/latest)
 2. Download `DevVault-v*-windows-x64.zip`
 3. Extract anywhere
 4. Double-click `DevVault.exe`
@@ -79,7 +79,7 @@ No installer, no Python required, no admin rights.
 ### Run from source
 
 ```powershell
-git clone https://github.com/Ohiocteator22/DevVault.git
+git clone https://github.com/Ohiocteator22/Lifeless-DevVault.git
 cd DevVault
 python -m venv .venv
 .venv\Scripts\activate

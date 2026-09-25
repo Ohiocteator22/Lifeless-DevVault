@@ -62,6 +62,6 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-[Unreleased]: https://github.com/Ohiocteator22/DevVault/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/Ohiocteator22/DevVault/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/Ohiocteator22/DevVault/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/Ohiocteator22/Lifeless-DevVault/releases/tag/v1.0.0
