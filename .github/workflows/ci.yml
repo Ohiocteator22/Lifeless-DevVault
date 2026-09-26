@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sanity:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install PySide6
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install PySide6
+
+      - name: Verify all tool modules import
+        shell: pwsh
+        run: |
+          python -c @"
+          import importlib
+          import sys
+          modules = [
+              'app.core.registry',
+              'app.core.settings',
+              'app.core.theme',
+              'app.core.version',
+              'app.core.updater',
+              'app.core.clipboard',
+              'app.core.resources',
+              'app.tools',
+              'app.ui.main_window',
+              'app.ui.workspace',
+              'app.ui.sidebar',
+              'app.ui.palette_page',
+              'app.ui.clipboard_banner',
+              'app.ui.update_banner',
+              'app.ui.tool_card',
+              'app.ui.transform_tool',
+          ]
+          failed = []
+          for m in modules:
+              try:
+                  importlib.import_module(m)
+              except Exception as e:
+                  failed.append((m, e))
+          if failed:
+              for name, err in failed:
+                  print(f'FAIL: {name}: {err}')
+              sys.exit(1)
+          print('All modules import cleanly.')
+          "@
+
+      - name: Verify tool registry
+        shell: pwsh
+        run: |
+          python -c @"
+          from app.tools import register_all_tools
+          from app.core.registry import registry
+          register_all_tools()
+          tools = registry.all()
+          if not tools:
+              raise SystemExit('Registry is empty')
+          print(f'{len(tools)} tools registered:')
+          for t in tools:
+              print(f'  {t.meta.category:10} {t.meta.name}')
+          "@
