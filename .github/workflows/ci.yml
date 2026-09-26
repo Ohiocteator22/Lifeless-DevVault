@@ -9,6 +9,7 @@ on:
 jobs:
   sanity:
     runs-on: windows-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -19,12 +20,21 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: requirements-ci.txt
 
-      - name: Install PySide6
+      - name: Show cache status
+        shell: pwsh
+        run: |
+          Write-Host "Pip cache dir:"
+          python -m pip cache dir
+          Write-Host "Pip cache info:"
+          python -m pip cache info
+
+      - name: Install dependencies
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          pip install PySide6
+          pip install -r requirements-ci.txt
 
       - name: Verify all tool modules import
         shell: pwsh
