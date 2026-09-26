@@ -1,69 +1,59 @@
-# DevVault v1.1.0
+# DevVault v1.2.0
 
-_Released 2026-09-25_
+_Released 2026-09-26_
 
-This release turns DevVault from a collection of tools into a fast, keyboard-driven workspace. It adds a command palette, clipboard detection, a fullscreen borderless UI, four working script obfuscators, and proper Windows branding.
+This release adds a background update checker so you never miss a new version. It also lays the groundwork for future automatic builds.
 
 ---
 
 ## ✨ Highlights
 
-### Command palette (Ctrl+K)
+### Automatic update check
 
-Press `Ctrl+K` anywhere and the window shrinks into a centered Spotlight-style palette. Type to filter tools by name, description, or keyword. `↑↓` to navigate, `Enter` to open, `Esc` to cancel and return to fullscreen.
+DevVault now checks GitHub for a newer release ~2.5 seconds after launch, on a background thread. If a newer version exists, a banner appears at the top of the workspace:
 
-### Clipboard detection
+> 🚀 **DevVault v1.3.0 is available** &nbsp; [View Release] &nbsp; [Skip This Version] &nbsp; [Later]
 
-Focus DevVault with a recognized snippet on your clipboard and a banner appears offering to open the right tool with the content already in the input box. Detects:
+- **View Release** — opens the GitHub release page in your default browser
+- **Skip This Version** — remembers your choice; that exact version never shows again
+- **Later** — hides the banner for this session; it reappears next launch
 
-- JSON
-- JWTs
-- UUIDs
-- MD5 / SHA-1 / SHA-256 hashes
-- URLs
-- Lua bytecode
-- Base64
-- Lua / JavaScript / Python / PowerShell source
+The check is a single HTTPS GET to the GitHub releases API. No telemetry, no tracking, no data leaves your machine beyond the standard request.
 
-Dismissals are remembered, and you can turn the feature off permanently from the banner.
+If you're offline, the API is unreachable, or you're already on the latest version, the check fails silently — no error banner, no nag.
 
-### Fullscreen borderless UI
+### Privacy
 
-DevVault now launches fullscreen with no window chrome. Minimize and close live in the top bar. The palette mode temporarily shrinks the window to a centered 640×420 box — the earlier location/size glitches from the old dialog approach are gone.
+The updater is intentionally minimal:
 
-### Proper Windows identity
+- No unique identifiers sent
+- No install IDs
+- No usage statistics
+- User-Agent is just `DevVault/1.2.0`
+- Respects GitHub's standard rate limits (60 checks/hour per IP — you'll do one per launch)
 
-The taskbar and Task Manager now show **DevVault** instead of `python.exe`, via `SetCurrentProcessExplicitAppUserModelID` and an embedded version resource. A multi-size `.ico` is embedded in the EXE and applied at runtime.
+You can disable the check permanently with a single setting (`update_check_enabled` in `QSettings`). A Settings page exposing this from the UI is planned for a future release.
 
-### Script tab — four working obfuscators
+---
 
-| Language   | Backend                  |
-| ---------- | ------------------------ |
-| Lua        | `@gamely/prometheus-cli` |
-| JavaScript | `javascript-obfuscator`  |
-| Python     | `pyobfus`                |
-| PowerShell | `psobf` v2.0.1           |
+## 🔧 Under the hood
 
-Each tool auto-detects its backend on `PATH` and shows a friendly install hint if missing. All obfuscators run as local subprocesses — nothing touches the network.
+- **`app/core/version.py`** — single source of truth for the app version. Keep it in sync with `version_info.txt` when bumping releases.
+- **`app/core/updater.py`** — `UpdateChecker(QThread)` hits the GitHub releases API using only `urllib` (no new dependencies).
+- **`app/ui/update_banner.py`** — banner widget matching the existing clipboard banner style.
+- Update banner and clipboard banner are stacked in the top of the workspace; only one is visible at a time under normal use.
 
 ---
 
 ## 🐛 Fixes
 
-- **PowerShell obfuscator crash** — fixed `UnicodeDecodeError` when output contained non-ASCII bytes. All subprocess I/O now uses UTF-8 with error replacement.
-- **Windows tool resolution** — subprocess calls now resolve `.cmd` / `.exe` shims explicitly via `shutil.which`, bypassing the `CreateProcess` extension quirk that caused "Tool not found" errors.
-
----
-
-## 🗑️ Removed
-
-- **Lua Deobfuscator** — Prometheus obfuscates source-level Lua, not bytecode. Feeding obfuscated source to `unluac` fails by design, so the tool was removed to avoid misleading users.
+- None in this release. All obfuscators, the command palette, and clipboard detection are unchanged from v1.1.0.
 
 ---
 
 ## 📦 Install
 
-1. Download `DevVault-v1.1.0-windows-x64.zip` below
+1. Download `DevVault-v1.2.0-windows-x64.zip` below
 2. Extract anywhere
 3. Double-click `DevVault.exe`
 
@@ -98,9 +88,11 @@ Install whichever you want to use:
 
 ---
 
-## ⬆️ Upgrading from v1.0.0
+## ⬆️ Upgrading from v1.1.0
 
 Replace the contents of your `DevVault/` folder with the new release. Your settings — theme, favorites, clipboard dismissals — are stored in `%APPDATA%\DevVault\` and carry over automatically.
+
+Once you're on v1.2.0, **future releases will notify you automatically**. No manual checks required.
 
 ---
 

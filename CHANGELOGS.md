@@ -5,6 +5,33 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.2.0] — 2026-09-26
+
+### Added
+
+- **Automatic update check** — on startup, DevVault queries the GitHub releases API on a background thread and shows a banner if a newer version is available.
+  - **View Release** button opens the release page in the default browser.
+  - **Skip This Version** button persists your choice via `QSettings`; that exact version never shows again.
+  - **Later** button hides the banner for the current session only.
+  - Check runs ~2.5 seconds after launch and fails silently when offline, rate-limited, or already up-to-date.
+- **`app/core/version.py`** — single source of truth for `APP_VERSION`. Must be kept in sync with `version_info.txt` when bumping releases.
+- **`app/core/updater.py`** — `UpdateChecker(QThread)` using only Python's standard library (`urllib`), no new dependencies.
+- **`app/ui/update_banner.py`** — reusable banner widget, styled to match the clipboard banner.
+- **`update_check_enabled`** and **`skipped_version`** settings.
+
+### Changed
+
+- `MainWindow` now runs the update check via `QTimer.singleShot(2500, ...)` after the window is drawn, so startup remains instantaneous.
+- `MainWindow.closeEvent` waits briefly for the update thread to finish cleanly before quitting.
+- Update banner and clipboard banner share theme styling via a combined QSS selector.
+
+### Notes
+
+- Updater is intentionally minimal: no telemetry, no install IDs, no usage data. User-Agent is just `DevVault/<version>`.
+- Manual disabling is available via `QSettings` (`update_check_enabled = false`). A Settings page exposing this from the UI is planned.
+
+---
+
 ## [1.1.0] — 2026-09-25
 
 ### Added
@@ -17,7 +44,7 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Window controls** — minimize and close buttons in the top bar for the frameless window.
 - **JavaScript Obfuscator** — wraps `javascript-obfuscator` with control-flow flattening, dead-code injection, and string-array encoding.
 - **Python Obfuscator** — wraps `pyobfus`.
-- **PowerShell Obfuscator** — wraps `psobf` v2.0.1 with six obfuscation levels (char join, Base64, GZip+Base64, fragmentation, AES-256 CTR).
+- **PowerShell Obfuscator** — wraps `psobf` v2.0.1 with six obfuscation levels.
 - **`SubprocessObfuscatorWidget`** base class — adding a new language obfuscator is now ~40 lines.
 - **`app/core/resources.py`** — path resolver that works from source, PyInstaller onedir, and PyInstaller onefile.
 - **`version_info.txt`** — Windows EXE version resource.
@@ -27,7 +54,7 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - App now launches in fullscreen borderless mode instead of a resizable window.
-- `Ctrl+K` opens a palette page inside the main window instead of a separate dialog, eliminating the earlier location/size glitches.
+- `Ctrl+K` opens a palette page inside the main window instead of a separate dialog, eliminating earlier location/size glitches.
 - Settings now include `clipboard_enabled` and `clipboard_dismissed`.
 
 ### Fixed
@@ -37,7 +64,7 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Removed
 
-- **Lua Deobfuscator** — Prometheus obfuscates source-level Lua, not bytecode, so an obfuscate → decompile roundtrip isn't meaningful. Removed to avoid misleading users.
+- **Lua Deobfuscator** — Prometheus obfuscates source-level Lua, not bytecode, so an obfuscate → decompile roundtrip isn't meaningful.
 
 ---
 
@@ -62,6 +89,7 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-[Unreleased]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Ohiocteator22/Lifeless-DevVault/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Ohiocteator22/Lifeless-DevVault/releases/tag/v1.0.0
