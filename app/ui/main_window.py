@@ -1,4 +1,4 @@
-from PySide6.QtCore import QEvent, Qt
+from PySide6.QtCore import QEvent, Qt, QTimer
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
@@ -17,9 +17,11 @@ from app.core.clipboard import fingerprint
 from app.core.registry import registry
 from app.core.resources import app_icon_path
 from app.core.settings import settings
+from app.core.updater import UpdateChecker
 from app.ui.clipboard_banner import ClipboardBanner
 from app.ui.palette_page import PalettePage
 from app.ui.sidebar import Sidebar
+from app.ui.update_banner import UpdateBanner
 from app.ui.workspace import Workspace
 
 
@@ -57,11 +59,15 @@ class MainWindow(QMainWindow):
 
         self._palette_mode = False
         self._last_clipboard_hash: str | None = None
+        self._update_thread: UpdateChecker | None = None
 
         # Shortcuts
         QShortcut(
             QKeySequence("Ctrl+K"), self, activated=self._enter_palette_mode
         )
+
+        # Kick off the update check after the window is drawn.
+        QTimer.singleShot(2500, self._check_for_updates)
 
     # ---------------- normal page ----------------
 
@@ -83,6 +89,12 @@ class MainWindow(QMainWindow):
         # Top bar
         self.top_bar = self._build_top_bar()
         right_layout.addWidget(self.top_bar)
+
+        # Update banner (hidden by default)
+        self.update_banner = UpdateBanner()
+        self.update_banner.skip_requested.connect(self._on_update_skip)
+        self.update_banner.dismissed.connect(self._on_update_dismissed)
+        right_layout.addWidget(self.update_banner)
 
         # Clipboard banner (hidden by default)
         self.clipboard_banner = ClipboardBanner()
@@ -156,7 +168,6 @@ class MainWindow(QMainWindow):
         self.central_stack.setCurrentIndex(1)
         self.palette_page.activate()
 
-        # Exit fullscreen, shrink to centered palette window.
         self.setWindowState(Qt.WindowNoState)
         screen = QApplication.primaryScreen().availableGeometry()
         w, h = PALETTE_WIDTH, PALETTE_HEIGHT
@@ -253,6 +264,48 @@ class MainWindow(QMainWindow):
         text = QApplication.clipboard().text()
         self.workspace.open_tool(tool, prefill=text)
 
+    # ---------------- updates ----------------
+
+    def _check_for_updates(self) -> None:
+        if not settings.update_check_enabled:
+            return
+        # Avoid stacking checks
+        if self._update_thread is not None and self._update_thread.isRunning():
+            return
+
+        self._update_thread = UpdateChecker(self)
+        self._update_thread.result.connect(self._on_update_result)
+        self._update_thread.finished.connect(self._on_update_thread_finished)
+        self._update_thread.start()
+
+    def _on_update_result(self, data) -> None:
+        if not data:
+            return
+
+        version = data.get("version", "")
+        url = data.get("url", "")
+        title = data.get("title", "")
+
+        if not version or not url:
+            return
+
+        # Respect "Skip This Version"
+        if settings.skipped_version == version:
+            return
+
+        self.update_banner.show_update(version, url, title)
+
+    def _on_update_thread_finished(self) -> None:
+        # Drop our reference so the thread can be GC'd
+        self._update_thread = None
+
+    def _on_update_skip(self, version: str) -> None:
+        settings.skipped_version = version
+
+    def _on_update_dismissed(self) -> None:
+        # "Later" — no persistence, banner just hides
+        pass
+
     # ---------------- keys ----------------
 
     def keyPressEvent(self, event) -> None:
@@ -262,5 +315,9 @@ class MainWindow(QMainWindow):
         super().keyPressEvent(event)
 
     def closeEvent(self, event) -> None:
+        # Let the checker thread finish cleanly if it's still running.
+        if self._update_thread is not None and self._update_thread.isRunning():
+            self._update_thread.quit()
+            self._update_thread.wait(1500)
         QApplication.quit()
         super().closeEvent(event)

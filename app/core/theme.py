@@ -153,8 +153,8 @@ QScrollBar::handle:vertical:hover { background: #585b70; }
 QScrollBar::add-line, QScrollBar::sub-line { height: 0; }
 QSplitter::handle { background: #313244; }
 
-/* Clipboard banner */
-QFrame#ClipboardBanner {
+/* Info banners (clipboard + update) */
+QFrame#ClipboardBanner, QFrame#UpdateBanner {
     background: #313244;
     border-bottom: 1px solid #45475a;
 }
@@ -304,8 +304,8 @@ QLabel#StatusLabel[error="true"] { color: #d20f39; }
 QScrollArea { border: none; }
 QSplitter::handle { background: #ccd0da; }
 
-/* Clipboard banner */
-QFrame#ClipboardBanner {
+/* Info banners (clipboard + update) */
+QFrame#ClipboardBanner, QFrame#UpdateBanner {
     background: #dce0e8;
     border-bottom: 1px solid #ccd0da;
 }

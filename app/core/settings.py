@@ -41,7 +41,7 @@ class AppSettings:
         else:
             favs.append(tool_id)
         self.favorites = favs
-        return tool_id in favs
+        return tool_id in self.favorites
 
     # --- clipboard ----------------------------------------------------
 
@@ -64,8 +64,25 @@ class AppSettings:
 
     @clipboard_dismissed.setter
     def clipboard_dismissed(self, value: List[str]) -> None:
-        # Cap to last 50 to prevent unbounded growth
         self._s.setValue("clipboard_dismissed", value[-50:])
+
+    # --- updates ------------------------------------------------------
+
+    @property
+    def update_check_enabled(self) -> bool:
+        return self._s.value("update_check_enabled", True, type=bool)
+
+    @update_check_enabled.setter
+    def update_check_enabled(self, value: bool) -> None:
+        self._s.setValue("update_check_enabled", value)
+
+    @property
+    def skipped_version(self) -> str:
+        return self._s.value("skipped_version", "", type=str)
+
+    @skipped_version.setter
+    def skipped_version(self, value: str) -> None:
+        self._s.setValue("skipped_version", value)
 
 
 settings = AppSettings()
