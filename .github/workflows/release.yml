@@ -22,6 +22,19 @@ jobs:
           python-version: "3.12"
           cache: "pip"
 
+      - name: Check version consistency
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}".TrimStart('v')
+          $pyVersion = (Get-Content app\core\version.py |
+                        Select-String 'APP_VERSION\s*=\s*"([^"]+)"').Matches.Groups[1].Value
+          Write-Host "Tag version:    $tag"
+          Write-Host "Python version: $pyVersion"
+          if ($tag -ne $pyVersion) {
+            Write-Error "Version mismatch: tag=$tag, APP_VERSION=$pyVersion"
+            exit 1
+          }
+
       - name: Install dependencies
         shell: pwsh
         run: |
@@ -58,7 +71,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: DevVault-*.zip
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
         env:
